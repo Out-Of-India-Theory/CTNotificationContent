@@ -11,28 +11,21 @@ let package = Package(
             name: "CTNotificationContent",
             targets: ["CTNotificationContentWrapper"])
     ],
-    dependencies: [
-        // SDWebImage is listed here so SPM resolves it as a single shared dependency.
-        // If another package in the app also adds SDWebImage with the same URL,
-        // SPM deduplicates it automatically — no conflicts.
-        .package(
-            url: "https://github.com/SDWebImage/SDWebImage.git",
-            from: "5.11.0"
-        ),
-    ],
+    // No SDWebImage package: the prebuilt CTNotificationContent binary already contains
+    // SDWebImage, so linking the package too put two copies of every SD* class in the
+    // extension process.
+    dependencies: [],
     targets: [
         // The pre-built xcframework binary — cannot have dependencies itself.
         .binaryTarget(
             name: "CTNotificationContentBinary",
             path: "Framework/CTNotificationContent.xcframework"
         ),
-        // Thin wrapper source target that re-exports the binary and pulls in SDWebImage.
-        // This is the standard SPM pattern for adding dependencies alongside a binaryTarget.
+        // Thin wrapper source target that re-exports the binary.
         .target(
             name: "CTNotificationContentWrapper",
             dependencies: [
                 "CTNotificationContentBinary",
-                .product(name: "SDWebImage", package: "SDWebImage"),
             ],
             path: "Sources/CTNotificationContentWrapper"
         ),
